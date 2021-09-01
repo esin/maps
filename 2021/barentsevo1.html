@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html xmlns="https://www.w3.org/1999/xhtml">
+        <head>
+                <title>Маршрут (Баренцево море)</title>
+                <base target="_top"></base>
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+                <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+                <meta name="geo.position" content="69.3961045; 33.5379619" />
+                <meta name="ICBM" content="69.3961045, 33.5379619" />
+        </head>
+        <body style="margin:0px;">
+
+                <script type="text/javascript">
+                        API = 'leaflet'; // can be either 'leaflet' or 'google'
+                        if (self.API && API.match(/^g/i)) {
+                                google_api_key = ''; // Your project's Google Maps API key goes here (https://code.google.com/apis/console)
+                                language_code = '';
+                                document.writeln('<script src="https://maps.googleapis.com/maps/api/js?v=3&amp;libraries=geometry&amp;language='+(self.language_code?self.language_code:'')+'&amp;key='+(self.google_api_key?self.google_api_key:'')+'" type="text/javascript"><'+'/script>');
+                        } else {
+                                document.writeln('<link href="https://unpkg.com/leaflet/dist/leaflet.css" rel="stylesheet" />');
+                                document.writeln('<script src="https://unpkg.com/leaflet/dist/leaflet.js" type="text/javascript"><'+'/script>');
+                        }
+                        thunderforest_api_key = ''; // To display OpenStreetMap tiles from ThunderForest, you need a key (https://www.thunderforest.com/docs/apikeys/)
+                        ign_api_key = ''; // To display topo tiles from IGN.fr, you need a key (https://api.ign.fr/)
+                </script>
+
+
+                <!--
+                        If you want to transplant this map into another Web page, by far the best method is to
+                        simply include it in a IFRAME tag (see https://www.gpsvisualizer.com/faq.html#google_html).
+                        But, if you must paste the code into another page, be sure to include all of these parts:
+                           1. The "div" tags that contain the map and its widgets, below
+                           2. Three sections of JavaScript code:
+                              a. The API code (from googleapis.com or unpkg.com/leaflet), above
+                              b. "gv_options" and the code that calls a .js file on gpsvisualizer.com
+                              c. The "GV_Map" function, which contains all the geographic info for the map
+                -->
+                <div style="margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px;">
+                        <div id="gmap_div" style="width:700px; height:350px; margin:0px; margin-right:12px; background-color:#f0f0f0; float:left; overflow:hidden;">
+                                <p style="text-align:center; font:10px Arial;">This map was created using <a target="_blank" href="https://www.gpsvisualizer.com/">GPS Visualizer</a>'s do-it-yourself geographic utilities.<br /><br />Please wait while the map data loads...</p>
+                        </div>
+
+                        <div id="gv_infobox" class="gv_infobox" style="font:11px Arial; border:solid #666666 1px; background-color:#ffffff; padding:4px; overflow:auto; display:none; max-width:400px;">
+                                <!-- Although GPS Visualizer didn't create an legend/info box with your map, you can use this space for something else if you'd like; enable it by setting gv_options.infobox_options.enabled to true -->
+                        </div>
+
+
+                        <div id="gv_tracklist" class="gv_tracklist" style="font:11px Arial; line-height:11px; background-color:#ffffff; overflow:auto; display:none;"><!-- --></div>
+
+                        <div id="gv_marker_list" class="gv_marker_list" style="background-color:#ffffff; overflow:auto; display:none;"><!-- --></div>
+
+                        <div id="gv_clear_margins" style="height:0px; clear:both;"><!-- clear the "float" --></div>
+                </div>
+
+
+                <!-- begin GPS Visualizer setup script (must come after loading of API code) -->
+                <script type="text/javascript">
+                        /* Global variables used by the GPS Visualizer functions (20210901002433): */
+                        gv_options = {};
+
+                        // basic map parameters:
+                        gv_options.center = [69.3961044726893,33.5379618639126];  // [latitude,longitude] - be sure to keep the square brackets
+                        gv_options.zoom = 8;  // higher number means closer view; can also be 'auto' for automatic zoom/center based on map elements
+                        gv_options.map_type = 'GV_OSM_RELIEF';  // popular map_type choices are 'GV_STREET', 'GV_SATELLITE', 'GV_HYBRID', 'GV_TERRAIN', 'GV_OSM', 'GV_TOPO_US', 'GV_TOPO_WORLD' (https://www.gpsvisualizer.com/misc/leaflet_map_types.html)
+                        gv_options.map_opacity = 1.00;  // number from 0 to 1
+                        gv_options.full_screen = true;  // true|false: should the map fill the entire page (or frame)?
+                        gv_options.width = 700;  // width of the map, in pixels
+                        gv_options.height = 350;  // height of the map, in pixels
+
+                        gv_options.map_div = 'gmap_div';  // the name of the HTML "div" tag containing the map itself; usually 'gmap_div'
+                        gv_options.doubleclick_zoom = true;  // true|false: zoom in when mouse is double-clicked?
+                        gv_options.doubleclick_center = true;  // true|false: re-center the map on the point that was double-clicked?
+                        gv_options.scroll_zoom = true; // true|false; or 'reverse' for down=in and up=out
+                        gv_options.page_scrolling = true; // true|false; does the map relenquish control of the scroll wheel when embedded in scrollable pages?
+                        gv_options.autozoom_adjustment = 0;
+                        gv_options.centering_options = { 'open_info_window':true, 'partial_match':true, 'center_key':'center', 'default_zoom':null } // URL-based centering (e.g., ?center=name_of_marker&zoom=14)
+                        gv_options.street_view = false; // true|false: allow Google Street View on the map (Google Maps only)
+                        gv_options.tilt = false; // true|false: allow Google Maps to show 45-degree tilted aerial imagery?
+                        gv_options.disable_google_pois = false;  // true|false: if you disable clickable POIs on Google Maps, you also lose the labels on parks, airports, etc.
+                        gv_options.animated_zoom = true; // true|false: only affects Leaflet maps
+
+                        // widgets on the map:
+                        gv_options.zoom_control = 'large'; // 'large'|'small'|'none'
+                        gv_options.recenter_button = true; // true|false: is there a 'click to recenter' button above the zoom control?
+                        gv_options.geolocation_control = false; // true|false; only works on secure servers
+                        gv_options.geolocation_options = { center:true, zoom:null, marker:true, info_window:true };
+                        gv_options.scale_control = true; // true|false
+                        gv_options.map_opacity_control = false;  // true|false
+                        gv_options.map_type_control = {};  // widget to change the background map
+                          gv_options.map_type_control.visible = true; // true|false: is a map type control placed on the map itself?
+                          gv_options.map_type_control.filter = false;  // true|false: when map loads, are irrelevant maps ignored?
+                          gv_options.map_type_control.excluded = [];  // comma-separated list of quoted map IDs that will never show in the list ('included' also works)
+                        gv_options.center_coordinates = true;  // true|false: show a "center coordinates" box and crosshair?
+                        gv_options.measurement_tools = true; // true|false: put a measurement ruler on the map?
+                        gv_options.measurement_options = { visible:false, distance_color:'', area_color:'' };
+                        gv_options.crosshair_hidden = true;  // true|false: hide the crosshair initially?
+                        gv_options.mouse_coordinates = false;  // true|false: show a "mouse coordinates" box?
+                        gv_options.utilities_menu = { 'maptype':true, 'opacity':true, 'measure':true, 'geolocate':true, 'profile':false, 'export':false };
+                        gv_options.allow_export = false;  // true|false
+
+                        gv_options.infobox_options = {}; // options for a floating info box (id="gv_infobox"), which can contain anything
+                          gv_options.infobox_options.enabled = true;  // true|false: enable or disable the info box altogether
+                          gv_options.infobox_options.position = ['LEFT_TOP',52,4];  // [Google anchor name, relative x, relative y]
+                          gv_options.infobox_options.draggable = true;  // true|false: can it be moved around the screen?
+                          gv_options.infobox_options.collapsible = true;  // true|false: can it be collapsed by double-clicking its top bar?
+
+                        // track-related options:
+                        gv_options.track_optimization = 1; // sets Leaflet's smoothFactor parameter
+                        gv_options.track_tooltips = false; // true|false: should the name of a track appear on the map when you mouse over the track itself?
+                        gv_options.tracklist_options = {}; // options for a floating list of the tracks visible on the map
+                          gv_options.tracklist_options.enabled = true;  // true|false: enable or disable the tracklist altogether
+                          gv_options.tracklist_options.position = ['RIGHT_TOP',4,32];  // [Google anchor name, relative x, relative y]
+                          gv_options.tracklist_options.min_width = 100; // minimum width of the tracklist, in pixels
+                          gv_options.tracklist_options.max_width = 180; // maximum width of the tracklist, in pixels
+                          gv_options.tracklist_options.min_height = 0; // minimum height of the tracklist, in pixels; if the list is longer, scrollbars will appear
+                          gv_options.tracklist_options.max_height = 135; // maximum height of the tracklist, in pixels; if the list is longer, scrollbars will appear
+                          gv_options.tracklist_options.desc = true;  // true|false: should tracks' descriptions be shown in the list
+                          gv_options.tracklist_options.toggle = false;  // true|false: should clicking on a track's name turn it on or off?
+                          gv_options.tracklist_options.checkboxes = true;  // true|false: should there be a separate icon/checkbox for toggling visibility?
+                          gv_options.tracklist_options.zoom_links = true;  // true|false: should each item include a small icon that will zoom to that track?
+                          gv_options.tracklist_options.highlighting = true;  // true|false: should the track be highlighted when you mouse over the name in the list?
+                          gv_options.tracklist_options.tooltips = false;  // true|false: should the name of the track appear on the map when you mouse over the name in the list?
+                          gv_options.tracklist_options.draggable = true;  // true|false: can it be moved around the screen?
+                          gv_options.tracklist_options.collapsible = true;  // true|false: can it be collapsed by double-clicking its top bar?
+                          gv_options.tracklist_options.header = 'Tracks:'; // HTML code; be sure to put backslashes in front of any single quotes, and don't include any line breaks
+                          gv_options.tracklist_options.footer = ''; // HTML code
+                        gv_options.profile_options = { visible:false, icon:false, units:'metric', filled:true, waypoints:true, height:120, width:'100%', y_min:null, y_max:null, gap_between_tracks:false }; // see https://www.gpsvisualizer.com/tutorials/profiles_in_maps.html
+
+
+                        // marker-related options:
+                        gv_options.default_marker = { color:'red',icon:'googlemini',scale:1 }; // icon can be a URL, but be sure to also include size:[w,h] and optionally anchor:[x,y]
+                        gv_options.vector_markers = false; // are the icons on the map in embedded SVG format?
+                        gv_options.marker_tooltips = true; // do the names of the markers show up when you mouse-over them?
+                        gv_options.marker_shadows = true; // true|false: do the standard markers have "shadows" behind them?
+                        gv_options.marker_link_target = '_blank'; // the name of the window or frame into which markers' URLs will load
+                        gv_options.info_window_width = 0;  // in pixels, the width of the markers' pop-up info "bubbles" (can be overridden by 'window_width' in individual markers)
+                        gv_options.thumbnail_width = 0;  // in pixels, the width of the markers' thumbnails (can be overridden by 'thumbnail_width' in individual markers)
+                        gv_options.photo_size = [0,0];  // in pixels, the size of the photos in info windows (can be overridden by 'photo_width' or 'photo_size' in individual markers)
+                        gv_options.hide_labels = false;  // true|false: hide labels when map first loads?
+                        gv_options.labels_behind_markers = false; // true|false: are the labels behind other markers (true) or in front of them (false)?
+                        gv_options.label_offset = [0,0];  // [x,y]: shift all markers' labels (positive numbers are right and down)
+                        gv_options.label_centered = false;  // true|false: center labels with respect to their markers?  (label_left is also a valid option.)
+                        gv_options.driving_directions = false;  // put a small "driving directions" form in each marker's pop-up window? (override with dd:true or dd:false in a marker's options)
+                        gv_options.garmin_icon_set = 'gpsmap'; // 'gpsmap' are the small 16x16 icons; change it to '24x24' for larger icons
+                        gv_options.marker_list_options = {};  // options for a dynamically-created list of markers
+                          gv_options.marker_list_options.enabled = false;  // true|false: enable or disable the marker list altogether
+                          gv_options.marker_list_options.floating = true;  // is the list a floating box inside the map itself?
+                          gv_options.marker_list_options.position = ['RIGHT_BOTTOM',6,38];  // floating list only: position within map
+                          gv_options.marker_list_options.min_width = 160; // minimum width, in pixels, of the floating list
+                          gv_options.marker_list_options.max_width = 160;  // maximum width
+                          gv_options.marker_list_options.min_height = 0;  // minimum height, in pixels, of the floating list
+                          gv_options.marker_list_options.max_height = 135;  // maximum height
+                          gv_options.marker_list_options.draggable = true;  // true|false, floating list only: can it be moved around the screen?
+                          gv_options.marker_list_options.collapsible = true;  // true|false, floating list only: can it be collapsed by double-clicking its top bar?
+                          gv_options.marker_list_options.include_tickmarks = false;  // true|false: are distance/time tickmarks included in the list?
+                          gv_options.marker_list_options.include_trackpoints = false;  // true|false: are "trackpoint" markers included in the list?
+                          gv_options.marker_list_options.dividers = false;  // true|false: will a thin line be drawn between each item in the list?
+                          gv_options.marker_list_options.desc = false;  // true|false: will the markers' descriptions be shown below their names in the list?
+                          gv_options.marker_list_options.icons = true;  // true|false: should the markers' icons appear to the left of their names in the list?
+                          gv_options.marker_list_options.thumbnails = false;  // true|false: should markers' thumbnails be shown in the list?
+                          gv_options.marker_list_options.folders_collapsed = false;  // true|false: do folders in the list start out in a collapsed state?
+                          gv_options.marker_list_options.folders_hidden = false;  // true|false: do folders in the list start out in a hidden state?
+                          gv_options.marker_list_options.collapsed_folders = []; // an array of folder names
+                          gv_options.marker_list_options.hidden_folders = []; // an array of folder names
+                          gv_options.marker_list_options.count_folder_items = false;  // true|false: list the number of items in each folder?
+                          gv_options.marker_list_options.wrap_names = true;  // true|false: should marker's names be allowed to wrap onto more than one line?
+                          gv_options.marker_list_options.unnamed = '[unnamed]';  // what 'name' should be assigned to  unnamed markers in the list?
+                          gv_options.marker_list_options.colors = false;  // true|false: should the names/descs of the points in the list be colorized the same as their markers?
+                          gv_options.marker_list_options.default_color = '';  // default HTML color code for the names/descs in the list
+                          gv_options.marker_list_options.limit = 0;  // how many markers to show in the list; 0 for no limit
+                          gv_options.marker_list_options.center = false;  // true|false: does the map center upon a marker when you click its name in the list?
+                          gv_options.marker_list_options.zoom = false;  // true|false: does the map zoom to a certain level when you click on a marker's name in the list?
+                          gv_options.marker_list_options.zoom_level = 13;  // if 'zoom' is true, what level should the map zoom to?
+                          gv_options.marker_list_options.info_window = true;  // true|false: do info windows pop up when the markers' names are clicked in the list?
+                          gv_options.marker_list_options.url_links = false;  // true|false: do the names in the list become instant links to the markers' URLs?
+                          gv_options.marker_list_options.toggle = false;  // true|false: does a marker disappear if you click on its name in the list?
+                          gv_options.marker_list_options.help_tooltips = false;  // true|false: do "tooltips" appear on marker names that tell you what happens when you click?
+                          gv_options.marker_list_options.id = 'gv_marker_list';  // id of a DIV tag that holds the list
+                          gv_options.marker_list_options.header = ''; // HTML code; be sure to put backslashes in front of any single quotes, and don't include any line breaks
+                          gv_options.marker_list_options.footer = ''; // HTML code
+                        gv_options.marker_filter_options = {};  // options for removing waypoints that are out of the current view
+                          gv_options.marker_filter_options.enabled = false;  // true|false: should out-of-range markers be removed?
+                          gv_options.marker_filter_options.movement_threshold = 8;  // in pixels, how far the map has to move to trigger filtering
+                          gv_options.marker_filter_options.limit = 0;  // maximum number of markers to display on the map; 0 for no limit
+                          gv_options.marker_filter_options.update_list = true;  // true|false: should the marker list be updated with only the filtered markers?
+                          gv_options.marker_filter_options.sort_list_by_distance = false;  // true|false: should the marker list be sorted by distance from the center of the map?
+                          gv_options.marker_filter_options.min_zoom = 0;  // below this zoom level, don't show any markers at all
+                          gv_options.marker_filter_options.zoom_message = '';  // message to put in the marker list if the map is below the min_zoom threshold
+                        gv_options.synthesize_fields = {}; // for example: {label:'{name}'} would cause all markers' names to become visible labels
+
+
+
+                        // Load GPS Visualizer's mapping functions (this must be loaded AFTER gv_options are set):
+                        var script_file = (self.API && API.match(/^g/i)) ? 'google_maps/functions3.js' : 'leaflet/functions.js';
+                        if (document.location.protocol == 'https:') { // secure pages require secure scripts
+                                document.writeln('<script src="https://www.gpsvisualizer.com/'+script_file+'" type="text/javascript"><'+'/script>');
+                        } else {
+                                document.writeln('<script src="http://maps.gpsvisualizer.com/'+script_file+'" type="text/javascript"><'+'/script>');
+                        }
+                </script>
+                <style type="text/css">
+                        /* Put any custom style definitions here (e.g., .gv_marker_info_window, .gv_marker_info_window_name, .gv_marker_list_item, .gv_tooltip, .gv_label, etc.) */
+                        #gmap_div .gv_marker_info_window {
+                                font-size:11px !important;
+                        }
+                        #gmap_div .gv_label {
+                                opacity:0.90; filter:alpha(opacity=90);
+                                color:white; background:#333333; border:1px solid black; padding:1px;
+                                font-family:Verdana !important; font-size:10px;
+                                font-weight:normal !important;
+                        }
+                        .legend_block {
+                                display:inline-block; border:solid 1px black; width:9px; height:9px; margin:0px 2px 0px 0px;
+                        }
+
+                </style>
+
+                <!-- end GPSV setup script and styles; begin map-drawing script (they must be separate) -->
+                <script type="text/javascript">
+                        function GV_Map() {
+                                GV_Setup_Map();
+
+                                // Track #1
+                                t = 1; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 1 (07.08), отрезок 1. 07.08'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#e60000'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#e60000'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.5357841532677,31.9916733540595],[69.5357917807996,31.9923862349242],[69.5363908354193,31.9925147294998],[69.5372520759702,31.9915216416121],[69.5386371854693,31.9915767107159],[69.5408901572227,31.9931637402624],[69.5420175231993,31.9939524773508],[69.5430668536574,31.9957144372165],[69.5442267414182,31.9971132092178],[69.546660259366,31.9962393958122],[69.5484750252217,31.9977835938334],[69.5491323340684,31.9987315870821],[69.5512628462166,32.0026693213731],[69.5558999665082,32.0159303303808],[69.5567401684821,32.017471594736],[69.5585834328085,32.0209944248199],[69.5589272584766,32.0223652850837],[69.5601694565266,32.024736860767],[69.5603499189019,32.0262868423015],[69.5616049412638,32.0280598662794],[69.5639108866453,32.034007832408],[69.564708173275,32.0364768896252],[69.5658284984529,32.0405968464911],[69.5658771134913,32.0421287231147],[69.5666112005711,32.0466417912394],[69.5683879125863,32.0538501441479],[69.570120871067,32.0610726624727],[69.5721720904112,32.0680323243141],[69.5753766596317,32.0766493398696],[69.5770377852023,32.0822889357805],[69.5790792815387,32.0883904583752],[69.5816421322525,32.0985221676528],[69.5818041544408,32.0992216374725],[69.5821671746671,32.1010663267225],[69.5868779718876,32.117564259097],[69.5886695198715,32.1267341449857],[69.5889991801232,32.1309886313975],[69.5889901276678,32.1348761580884],[69.5885777380317,32.1397751290351],[69.5882260333747,32.1524855308235],[69.5869090687484,32.1637185383588],[69.585877340287,32.1681496314704],[69.5858521945775,32.1682407427579] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #2
+                                t = 2; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 1 (07.08), отрезок 2. 07.08'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#e65c00'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#e65c00'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.5858449023217,32.1681929659098],[69.5870920456946,32.167559210211],[69.5873170159757,32.1734107006341],[69.5849383156747,32.1954209078103],[69.5804234035313,32.2247099597007],[69.5783677417785,32.2350108157843],[69.5765233039856,32.2502641193569],[69.5745379664004,32.2612154949456],[69.572932748124,32.2673380561173],[69.5714984368533,32.2752381674945],[69.5683940313756,32.3019551485777],[69.5642041694373,32.3630921635777],[69.5636591780931,32.378625171259],[69.5627706125379,32.3849211540073],[69.5624279603362,32.3953739739954],[69.5595212001354,32.4125229287893],[69.5573861617595,32.4234938342124],[69.5550265721977,32.4370938912034],[69.5539443008602,32.4389099143445],[69.551956448704,32.4397477693856],[69.548592204228,32.4384518433362],[69.5453828573227,32.4346925597638],[69.5435914769769,32.43318147026],[69.5409413706511,32.4296906590462],[69.5402602571994,32.4290700629354],[69.538890235126,32.4264278355986],[69.5382223650813,32.424235297367],[69.5336942095309,32.4199376441538],[69.5329875312746,32.4133852589875],[69.5322519354522,32.410965738818],[69.525850256905,32.4087575264275],[69.5249392278492,32.4077117163688],[69.5228281617165,32.403420181945],[69.5187388826162,32.3966072872281],[69.5182529836893,32.3952546156943],[69.5157349761575,32.3921375535429],[69.5154644921422,32.3910558689386],[69.5157421007752,32.3920680675656] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #3
+                                t = 3; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 2 (08.08), отрезок 1'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#e6b800'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#e6b800'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.5170811098069,32.3957421910018],[69.5179947372526,32.4016472417861],[69.518104204908,32.4074765201658],[69.517805557698,32.4128813389689],[69.5180640555918,32.4144073482603],[69.5183847472072,32.4142854753882],[69.5183216314763,32.4151248391718],[69.5184176880866,32.4161540530622],[69.515619976446,32.4431162048131],[69.514990914613,32.4448101036251],[69.5125008188188,32.455592667684],[69.5104222744703,32.4707578774542],[69.5083063468337,32.4874521140009],[69.5074212178588,32.493829568848],[69.5056678913534,32.4988282006234],[69.5022944267839,32.5063316803426],[69.4988776277751,32.519843056798],[69.4975720625371,32.523955386132],[69.4968260731548,32.5260203517973],[69.4950099661946,32.5291727017611],[69.4909959565848,32.5450380519032],[69.4881701655686,32.5530984252691],[69.4867798592895,32.5568023044616],[69.4822577387094,32.5765657424927],[69.482142822817,32.5757780950516],[69.4810661673546,32.6027570106089],[69.4816878531128,32.6243487093598],[69.4814566802233,32.6295036636293],[69.4826099462807,32.6430431194603],[69.4833150319755,32.6479511428624],[69.4834277685732,32.6499307807535],[69.4820764381438,32.6628284342587],[69.4819419085979,32.6712113432586],[69.4813383277506,32.678054664284],[69.480810854584,32.6807144936174],[69.4801332615316,32.6811721455306],[69.4798061158508,32.6812703814358],[69.4797301758081,32.6812223531306],[69.4796978216618,32.6811570581049],[69.4788159616292,32.6770858839154],[69.4788813404739,32.6762054488063],[69.4791254214942,32.6779547519982],[69.4778373744339,32.7061589341611],[69.4775203708559,32.7036565169692],[69.4775741826743,32.7113376930356],[69.4772095698863,32.7153282333165],[69.4763623271137,32.7173851523548],[69.4756030105054,32.7170097269118] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #4
+                                t = 4; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 2 (08.08), отрезок 2'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#b7e600'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#b7e600'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.4759320002049,32.7182105183601],[69.4773509725928,32.725097341463],[69.4777309242636,32.7275358047336],[69.477851036936,32.7308025676757],[69.4775228854269,32.7375955972821],[69.4776377175003,32.7404528204352],[69.4769913889468,32.7461511734873],[69.4770975038409,32.7470699138939],[69.4762158952653,32.7528628986329],[69.4756562355906,32.7552186325192],[69.4749918021262,32.7570163831115],[69.4746537599713,32.7584628481418],[69.4737925194204,32.7610816061497],[69.4735930301249,32.7619407512248],[69.4735423196107,32.7621050365269],[69.473519353196,32.7621570881456],[69.4734986498952,32.7622384764254],[69.4733662158251,32.7628206834197],[69.4715515337884,32.7682156953961],[69.4712273217738,32.7685078885406],[69.4694755878299,32.7730311825871],[69.4683083239943,32.7754719927907],[69.4677753187716,32.7769413404167],[69.4667520560324,32.7786620613188],[69.4662863574922,32.7787976805121],[69.4654701277614,32.7795256488025],[69.4646894373,32.7806691918522],[69.4645851664245,32.780991140753],[69.464269336313,32.7812296897173],[69.4633784238249,32.7823317423463],[69.4623102340847,32.7837932948023],[69.4614063296467,32.7845731470734],[69.4612938445061,32.7851266041398],[69.4614140409976,32.7845144737512],[69.4617343135178,32.7843149844557],[69.4615292921662,32.78465135023],[69.4613137934357,32.7851916477084],[69.4613051600754,32.7850406058133],[69.4613291323185,32.7850038092583],[69.4613640010357,32.7848330698907] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #5
+                                t = 5; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 3 (09.08), отрезок 1 (до г. порт-Владимир)'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#5be600'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#5be600'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.4622598588467,32.7838621102273],[69.4620980042964,32.7830018755049],[69.4647828955203,32.7815300133079],[69.4663239084184,32.7830020431429],[69.4677698705345,32.7877133432776],[69.4684214796871,32.7921063825488],[69.4685016945004,32.8131680097431],[69.4671491067857,32.8399414848536],[69.4672569818795,32.8455355670303],[69.4671438261867,32.8480563405901],[69.465281618759,32.8775364998728],[69.464615592733,32.8831962123513],[69.4646823965013,32.8833423927426],[69.4650007411838,32.8838095162064],[69.4651895854622,32.8853408060968],[69.4646395649761,32.8999559953809],[69.461872279644,32.9238709062338],[69.4618875347078,32.9285147320479],[69.4625290017575,32.9346798732877],[69.4624622818083,32.9393257945776],[69.4581552408636,32.9823678731918],[69.4571023061872,33.0015888344496],[69.4574942439795,33.0055974796414],[69.456779602915,33.0224803928286],[69.4567336700857,33.0390114337206],[69.4564145710319,33.0432118568569],[69.4566337577999,33.0430912412703],[69.4576317910105,33.0505320243537],[69.4573970977217,33.058183696121],[69.4568900763988,33.0610077269375],[69.453650387004,33.0685291439295],[69.4523779302835,33.0746132321656],[69.4512225687504,33.0760560929775],[69.4472319446504,33.0759099125862],[69.4423329737037,33.0724904313684],[69.4380376674235,33.0713736265898],[69.434024412185,33.073792308569],[69.4322307687253,33.0761454440653],[69.4285579025745,33.0801313742995],[69.4276429340243,33.0815500114113],[69.4255840033293,33.0844201426953],[69.4221285637468,33.0911212228239],[69.4180892407894,33.1027165800333],[69.4177764281631,33.1047838926315],[69.4171433430165,33.1077033933252] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #6
+                                t = 6; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 3 (09.08), отрезок 2'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#00e601'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#00e601'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.4171622022986,33.1077877152711],[69.4175188522786,33.1052775867283],[69.4196320138872,33.098888900131],[69.4209322985262,33.0997232347727],[69.4234907906502,33.1074920855463],[69.4272237550467,33.1131649576128],[69.4295515771955,33.1162397749722],[69.4304465129972,33.1184779945761],[69.431609082967,33.1204785872251],[69.432425564155,33.1227712053806],[69.4358778186142,33.1346828956157],[69.4381751306355,33.1418982893229],[69.439267879352,33.1484173983335],[69.4392432365566,33.1533034611493],[69.4395257905126,33.1541330181062],[69.433834226802,33.1755253113806],[69.4319771323353,33.1836298573762],[69.4309519417584,33.1910023279488],[69.4299291819334,33.1960385944694],[69.4281321018934,33.2028601225466],[69.4279668945819,33.2035802956671],[69.423482241109,33.2164952158928],[69.4219351932406,33.2260836102068],[69.4198010768741,33.2339693047106],[69.417522707954,33.2396706752479],[69.4154448341578,33.266453454271],[69.4139349181205,33.2785601913929],[69.4131284952164,33.2810056116432],[69.4130388926715,33.2809878420085],[69.4126900378615,33.2877735793591],[69.4120562821627,33.2914348784834],[69.412665143609,33.2867648173124],[69.412448387593,33.2827062997967],[69.4118179008365,33.282157285139],[69.4117061700672,33.2817695382982] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #7
+                                t = 7; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 4 (10.08), отрезок 1'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#00e65d'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#00e65d'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.4122385047376,33.2825792301446],[69.4145920593292,33.2792061846703],[69.4175421539694,33.2792843878269],[69.4186283648014,33.2816516049206],[69.4190084841102,33.2819078397006],[69.4192736875266,33.2831227127463],[69.4204963557422,33.2852740120143],[69.4224733114243,33.2905686926097],[69.423503447324,33.2924146391451],[69.4242651946843,33.2946537807584],[69.4267041608691,33.3007518667728],[69.4272442907095,33.3020253293216],[69.4280378893018,33.3056520111859],[69.4285571482033,33.3087926264852],[69.4283104687929,33.3281098119915],[69.427213780582,33.3430340420455],[69.4269441347569,33.3454625308514],[69.4249808415771,33.3744447212666],[69.4249203242362,33.3839301858097],[69.4253748748451,33.3935278840363],[69.425443187356,33.4027271904051],[69.425448467955,33.4027887135744],[69.4249394349754,33.4386071003973],[69.4185284525156,33.455850686878],[69.415860241279,33.4651929046959],[69.4139743968844,33.4687001444399],[69.4117397814989,33.4729654435068],[69.4102291949093,33.4764958173037],[69.4098167214543,33.4777402784675],[69.4071685429662,33.4849634673446],[69.4051020685583,33.4931212384254],[69.403113797307,33.4978838358074],[69.402376357466,33.499071886763],[69.4000521395355,33.5009975451976],[69.3984910938889,33.5011797677726],[69.3947499152273,33.4993356652558],[69.3920453265309,33.4989383630455],[69.3875886686146,33.4946437273175],[69.3869458604604,33.494211807847],[69.3852126505226,33.4920134022832],[69.3844229914248,33.4891210589558],[69.3843039683998,33.4871314466],[69.3837366811931,33.4843004588038],[69.3828150071204,33.4747229609638] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #8
+                                t = 8; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 4 (10.08), отрезок 2'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#00e6b7'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#00e6b7'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.3827219679952,33.474892610684],[69.380638981238,33.4819017257541],[69.3766422383487,33.4837705548853],[69.3684826232493,33.4853545669466],[69.355745986104,33.4900916833431],[69.3455463834107,33.4904910810292],[69.3452339060605,33.4909638203681],[69.3422661256045,33.5093656182289],[69.3393591977656,33.5474108252674],[69.3347002845258,33.5886374674737],[69.3348633125424,33.5923518240452],[69.3327203113586,33.6028867028654],[69.3299481645226,33.6122207064182],[69.3275879044086,33.6173858027905],[69.3265499733388,33.6190948728472],[69.3259190674871,33.619551435113],[69.324919693172,33.6217811889946],[69.3216276168823,33.6278611700982],[69.3219009507447,33.628011206165],[69.3217868730426,33.6274426616728],[69.3206491973251,33.6296244710684],[69.3190002255142,33.6336560826749],[69.3152874615043,33.6392449680716],[69.3096859194338,33.6501897219568],[69.3080755881965,33.6550624575466],[69.3056610133499,33.6600408889353],[69.3024381715804,33.6718538403511],[69.3016355205327,33.6734501738101],[69.2985194642097,33.6716918181628],[69.2948662117124,33.6655755434185],[69.2905307561159,33.6564947571605],[69.289862383157,33.6543017160147],[69.2896583676338,33.6523158755153] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #9
+                                t = 9; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 5 (11.08)'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#00b8e6'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#00b8e6'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.2955808527768,33.6689682025462],[69.2964303586632,33.6704828962684],[69.2973905894905,33.6737054027617],[69.3022885546088,33.6988803651184],[69.3024521693587,33.6993768252432],[69.3030187021941,33.7002065498382],[69.3032288365066,33.7062075734138],[69.3058258853853,33.7224653642625],[69.307038327679,33.7319338135421],[69.3083974532783,33.7393561564386],[69.3081573117524,33.748556887731],[69.3069595377892,33.7636273819953],[69.3072111625224,33.7883659824729],[69.3079929426312,33.8117795716971],[69.3086515087634,33.8169636111706],[69.3102291505784,33.8253437541425],[69.3101402185857,33.827900737524],[69.3103748280555,33.8308857008815],[69.3100466765463,33.8404916971922],[69.3100609257817,33.8629101868719],[69.3114619608968,33.9046731032431],[69.312620004639,33.9196177851409],[69.3154944106936,33.9430094975978],[69.3157800659537,33.9462614245713],[69.3159200437367,33.9468959346414],[69.3159907031804,33.9471604675055],[69.3161706626415,33.9480021782219],[69.316356824711,33.9489498361945],[69.3165805377066,33.9506744965911],[69.3158866837621,33.954400671646],[69.3130673468113,33.9765013195574],[69.3105405382812,34.0113868005574],[69.3098759371787,34.0176751557738],[69.3090962525457,34.0297255665064],[69.3086600583047,34.057609140873],[69.3086379300803,34.0581845585257],[69.3061362672597,34.0642516314983],[69.305027006194,34.0656390041113],[69.3037535436451,34.0667546354234],[69.3035494443029,34.0672093536705],[69.3031172733754,34.0671078488231],[69.303356828168,34.0672453958541],[69.3033150024712,34.0680903755128],[69.3024773150682,34.070490533486],[69.3021023925394,34.0704203769565],[69.3017979618162,34.0691102854908],[69.3012151680887,34.0687134023756] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #10
+                                t = 10; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 6 (12.08), отрезок 1'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#005ce6'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#005ce6'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.302103901282,34.0705880150199],[69.3022470641881,34.0718222502619],[69.3028567638248,34.0722513198853],[69.3034431617707,34.074396584183],[69.3047693464905,34.0825770702213],[69.3068814184517,34.1109354794025],[69.306943109259,34.118347177282],[69.307545600459,34.1218057181686],[69.3062671925873,34.1382018104196],[69.3052802234888,34.1506647784263],[69.3058511149138,34.159136954695],[69.3039074353874,34.1655917745084],[69.3035208620131,34.1693078074604],[69.3042882252485,34.179381178692],[69.3042384367436,34.1911109816283],[69.3031927105039,34.2010467220098],[69.3031447660178,34.2203424498439],[69.3026806600392,34.2420286126435],[69.3027606233954,34.2494838964194],[69.3019303120673,34.2601072881371],[69.3021553661674,34.2664853297174],[69.3016775138676,34.2830949090421],[69.3017923459411,34.2929014842957],[69.303174437955,34.3114452715963],[69.3022344075143,34.3181060347706],[69.300499688834,34.3230897467583],[69.2979713715613,34.334786022082],[69.2912839539349,34.3771346658468],[69.290079055354,34.3805979844183],[69.2896656598896,34.38188158907],[69.2897896282375,34.3859857041389],[69.290116019547,34.3859249353409],[69.2898365668952,34.3861167971045],[69.2897547595203,34.3846635427326] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #11
+                                t = 11; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 6 (12.08), отрезок 2'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#0000e6'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#0000e6'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.291263082996,34.3837257754058],[69.2928019165993,34.3972999323159],[69.2931380309165,34.4025105424225],[69.2926442530006,34.4072034023702],[69.2916492372751,34.4110024999827],[69.2900783009827,34.4149373844266],[69.2881608568132,34.4181867130101],[69.2852753866464,34.4245607312769],[69.2844111286104,34.4259519595653],[69.2819502856582,34.4315046351403],[69.2789115104824,34.4371292274445],[69.2732606828213,34.4517073687166],[69.2704080697149,34.4598637148738],[69.2687844112515,34.4657663349062],[69.2682286072522,34.4668296631426],[69.2681681737304,34.467073911801],[69.2668526340276,34.4690896756947],[69.2668449226767,34.4690761808306],[69.2656513396651,34.471556218341],[69.2623304296285,34.4769798126072],[69.2613481543958,34.479238986969],[69.2590002994984,34.4831740390509],[69.2579380609095,34.4832716882229],[69.2568703740835,34.4815212115645],[69.2563895881176,34.4811105821282],[69.2553147766739,34.4792165234685],[69.255283344537,34.4783365912735],[69.2545972857624,34.4753502868116],[69.2548505030572,34.4745455402881],[69.2547030653805,34.4748549163342],[69.2548879701644,34.474822897464] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #12
+                                t = 12; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 7 (14.08), отрезок 1'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#5c00e6'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#5c00e6'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.2544942721725,34.475010400638],[69.2554455343634,34.4854171201587],[69.2582951299846,34.5004524104297],[69.2595546785742,34.5092020276934],[69.2602295055985,34.51375734061],[69.2619451973587,34.5211370196193],[69.2625214532018,34.5248595904559],[69.262545928359,34.5337655302137],[69.2623584251851,34.5394581835717],[69.2625589203089,34.5428710430861],[69.2614190652966,34.5683356840163],[69.2597236577421,34.5804534852505],[69.2589947674423,34.5878196693957],[69.2557003442198,34.6165909711272],[69.2554732784629,34.6202750690281],[69.2517831455916,34.6435161586851],[69.2508742958307,34.6461902372539],[69.2487504892051,34.6605423185974],[69.2474335245788,34.6724664978683],[69.2456356901675,34.7015587426722],[69.2445220705122,34.7091535013169],[69.2428150121123,34.7268003411591],[69.2408117372543,34.7397482860833],[69.2391853127629,34.7508929483593],[69.2390159983188,34.7522626351565],[69.2379241716117,34.7642793506384],[69.2370063532144,34.7708165645599],[69.2363611143082,34.7728656884283],[69.2360074818134,34.7748310770839],[69.2346678860486,34.784974353388],[69.2332370113581,34.8032316472381],[69.2252976726741,34.8533566016704],[69.2237609345466,34.8599538300186],[69.2222812771797,34.8630744963884] ] });
+                                GV_Draw_Track(t);
+
+                                // Track #13
+                                t = 13; trk[t] = {info:[],segments:[]};
+                                trk[t].info.name = 'День 7 (14.08), отрезок 2'; trk[t].info.desc = ''; trk[t].info.clickable = true;
+                                trk[t].info.color = '#b800e6'; trk[t].info.width = 3; trk[t].info.opacity = 0.9; trk[t].info.hidden = false; trk[t].info.z_index = null;
+                                trk[t].info.outline_color = 'black'; trk[t].info.outline_width = 0; trk[t].info.fill_color = '#b800e6'; trk[t].info.fill_opacity = 0;
+                                trk[t].segments.push({ points:[ [69.2238872498274,34.8625145014375],[69.2257418297231,34.8706833366305],[69.2260150797665,34.8783264588565],[69.2257300112396,34.8830484040082],[69.2242412175983,34.8902633786201],[69.2234365548939,34.9067107681185],[69.2233003489673,34.9162621144205],[69.2227555252612,34.92113141343],[69.2223488353193,34.9295517895371],[69.2216576635838,34.9417845904827],[69.2187806591392,34.9711109418422],[69.2185233347118,34.9763676524162],[69.2185383383185,34.9767802935094],[69.2171502951533,35.0097999628633],[69.2159538622946,35.0272928271443],[69.2152458429337,35.0483003910631],[69.2142833489925,35.0549400318414],[69.2126458603889,35.0609922688454],[69.2119608912617,35.062214853242],[69.2097225040197,35.0646958965808],[69.2054477334023,35.067777922377],[69.2053852882236,35.0722815189511],[69.2040607798845,35.078507848084],[69.2047234531492,35.0816456973553],[69.2044731695205,35.0825941935182],[69.2040202952921,35.0829609856009],[69.2032097652555,35.0844020862132],[69.2036333866417,35.0831386819482],[69.2032893933356,35.0840782932937] ] });
+                                GV_Draw_Track(t);
+
+                                t = 1; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 2; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 3; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 4; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 5; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 6; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 7; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 8; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 9; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 10; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 11; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 12; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+                                t = 13; GV_Add_Track_to_Tracklist({bullet:'- ',name:trk[t].info.name,desc:trk[t].info.desc,color:trk[t].info.color,number:t});
+
+
+                                GV_Draw_Marker({lat:69.5357842,lon:31.9916734,name:'Отрезок 1, 07.08.2021, 14:07:24 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.5357918,lon:31.9923862,name:'Отрезок 1, 07.08.2021, 14:07:24 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5363908,lon:31.9925147,name:'Отрезок 1, 07.08.2021, 14:07:24 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5372521,lon:31.9915216,name:'Отрезок 1, 07.08.2021, 14:07:24 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5386372,lon:31.9915767,name:'Отрезок 1, 07.08.2021, 14:07:24 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5408902,lon:31.9931637,name:'Отрезок 1, 07.08.2021, 14:07:24 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5420175,lon:31.9939525,name:'Отрезок 1, 07.08.2021, 14:07:24 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5430669,lon:31.9957144,name:'Отрезок 1, 07.08.2021, 14:07:24 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5442267,lon:31.9971132,name:'Отрезок 1, 07.08.2021, 14:07:24 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5466603,lon:31.9962394,name:'Отрезок 1, 07.08.2021, 14:07:24 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5484750,lon:31.9977836,name:'Отрезок 1, 07.08.2021, 14:07:24 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5491323,lon:31.9987316,name:'Отрезок 1, 07.08.2021, 14:07:24 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5512628,lon:32.0026693,name:'Отрезок 1, 07.08.2021, 14:07:24 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5559000,lon:32.0159303,name:'Отрезок 1, 07.08.2021, 14:07:24 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5567402,lon:32.0174716,name:'Отрезок 1, 07.08.2021, 14:07:24 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5585834,lon:32.0209944,name:'Отрезок 1, 07.08.2021, 14:07:24 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5589273,lon:32.0223653,name:'Отрезок 1, 07.08.2021, 14:07:24 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5601695,lon:32.0247369,name:'Отрезок 1, 07.08.2021, 14:07:24 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5603499,lon:32.0262868,name:'Отрезок 1, 07.08.2021, 14:07:24 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5616049,lon:32.0280599,name:'Отрезок 1, 07.08.2021, 14:07:24 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5639109,lon:32.0340078,name:'Отрезок 1, 07.08.2021, 14:07:24 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5647082,lon:32.0364769,name:'Отрезок 1, 07.08.2021, 14:07:24 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5658285,lon:32.0405968,name:'Отрезок 1, 07.08.2021, 14:07:24 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5658771,lon:32.0421287,name:'Отрезок 1, 07.08.2021, 14:07:24 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5666112,lon:32.0466418,name:'Отрезок 1, 07.08.2021, 14:07:24 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5683879,lon:32.0538501,name:'Отрезок 1, 07.08.2021, 14:07:24 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5701209,lon:32.0610727,name:'Отрезок 1, 07.08.2021, 14:07:24 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5721721,lon:32.0680323,name:'Отрезок 1, 07.08.2021, 14:07:24 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5753767,lon:32.0766493,name:'Отрезок 1, 07.08.2021, 14:07:24 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5770378,lon:32.0822889,name:'Отрезок 1, 07.08.2021, 14:07:24 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5790793,lon:32.0883905,name:'Отрезок 1, 07.08.2021, 14:07:24 31',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5816421,lon:32.0985222,name:'Отрезок 1, 07.08.2021, 14:07:24 32',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5818042,lon:32.0992216,name:'Отрезок 1, 07.08.2021, 14:07:24 33',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5821672,lon:32.1010663,name:'Отрезок 1, 07.08.2021, 14:07:24 34',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5868780,lon:32.1175643,name:'Отрезок 1, 07.08.2021, 14:07:24 35',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5886695,lon:32.1267341,name:'Отрезок 1, 07.08.2021, 14:07:24 36',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5889992,lon:32.1309886,name:'Отрезок 1, 07.08.2021, 14:07:24 37',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5889901,lon:32.1348762,name:'Отрезок 1, 07.08.2021, 14:07:24 38',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5885777,lon:32.1397751,name:'Отрезок 1, 07.08.2021, 14:07:24 39',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5882260,lon:32.1524855,name:'Отрезок 1, 07.08.2021, 14:07:24 40',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5869091,lon:32.1637185,name:'Отрезок 1, 07.08.2021, 14:07:24 41',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5858773,lon:32.1681496,name:'Отрезок 1, 07.08.2021, 14:07:24 42',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5858522,lon:32.1682407,name:'Отрезок 1, 07.08.2021, 14:07:24 43',desc:'',color:'',icon:'Pizza'});
+                                GV_Draw_Marker({lat:69.5858449,lon:32.1681930,name:'Отрезок 2. 07.08 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.5870920,lon:32.1675592,name:'Отрезок 2. 07.08 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5873170,lon:32.1734107,name:'Отрезок 2. 07.08 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5849383,lon:32.1954209,name:'Отрезок 2. 07.08 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5804234,lon:32.2247100,name:'Отрезок 2. 07.08 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5783677,lon:32.2350108,name:'Отрезок 2. 07.08 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5765233,lon:32.2502641,name:'Отрезок 2. 07.08 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5745380,lon:32.2612155,name:'Отрезок 2. 07.08 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5729327,lon:32.2673381,name:'Отрезок 2. 07.08 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5714984,lon:32.2752382,name:'Отрезок 2. 07.08 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5683940,lon:32.3019551,name:'Отрезок 2. 07.08 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5642042,lon:32.3630922,name:'Отрезок 2. 07.08 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5636592,lon:32.3786252,name:'Отрезок 2. 07.08 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5627706,lon:32.3849212,name:'Отрезок 2. 07.08 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5624280,lon:32.3953740,name:'Отрезок 2. 07.08 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5595212,lon:32.4125229,name:'Отрезок 2. 07.08 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5573862,lon:32.4234938,name:'Отрезок 2. 07.08 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5550266,lon:32.4370939,name:'Отрезок 2. 07.08 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5539443,lon:32.4389099,name:'Отрезок 2. 07.08 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5519564,lon:32.4397478,name:'Отрезок 2. 07.08 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5485922,lon:32.4384518,name:'Отрезок 2. 07.08 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5453829,lon:32.4346926,name:'Отрезок 2. 07.08 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5435915,lon:32.4331815,name:'Отрезок 2. 07.08 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5409414,lon:32.4296907,name:'Отрезок 2. 07.08 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5402603,lon:32.4290701,name:'Отрезок 2. 07.08 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5388902,lon:32.4264278,name:'Отрезок 2. 07.08 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5382224,lon:32.4242353,name:'Отрезок 2. 07.08 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5336942,lon:32.4199376,name:'Отрезок 2. 07.08 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5329875,lon:32.4133853,name:'Отрезок 2. 07.08 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5322519,lon:32.4109657,name:'Отрезок 2. 07.08 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5258503,lon:32.4087575,name:'Отрезок 2. 07.08 31',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5249392,lon:32.4077117,name:'Отрезок 2. 07.08 32',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5228282,lon:32.4034202,name:'Отрезок 2. 07.08 33',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5187389,lon:32.3966073,name:'Отрезок 2. 07.08 34',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5182530,lon:32.3952546,name:'Отрезок 2. 07.08 35',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5157350,lon:32.3921376,name:'Отрезок 2. 07.08 36',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5154645,lon:32.3910559,name:'Отрезок 2. 07.08 37',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5157421,lon:32.3920681,name:'Отрезок 2. 07.08 38',desc:'',color:'',icon:'Campground'});
+                                GV_Draw_Marker({lat:69.5170811,lon:32.3957422,name:'08.08.2021, 12:08:56 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.5179947,lon:32.4016472,name:'08.08.2021, 12:08:56 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5181042,lon:32.4074765,name:'08.08.2021, 12:08:56 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5178056,lon:32.4128813,name:'08.08.2021, 12:08:56 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5180641,lon:32.4144073,name:'08.08.2021, 12:08:56 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5183847,lon:32.4142855,name:'08.08.2021, 12:08:56 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5183216,lon:32.4151248,name:'08.08.2021, 12:08:56 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5184177,lon:32.4161541,name:'08.08.2021, 12:08:56 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5156200,lon:32.4431162,name:'08.08.2021, 12:08:56 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5149909,lon:32.4448101,name:'08.08.2021, 12:08:56 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5125008,lon:32.4555927,name:'08.08.2021, 12:08:56 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5104223,lon:32.4707579,name:'08.08.2021, 12:08:56 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5083063,lon:32.4874521,name:'08.08.2021, 12:08:56 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5074212,lon:32.4938296,name:'08.08.2021, 12:08:56 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5056679,lon:32.4988282,name:'08.08.2021, 12:08:56 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.5022944,lon:32.5063317,name:'08.08.2021, 12:08:56 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4988776,lon:32.5198431,name:'08.08.2021, 12:08:56 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4975721,lon:32.5239554,name:'08.08.2021, 12:08:56 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4968261,lon:32.5260204,name:'08.08.2021, 12:08:56 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4950100,lon:32.5291727,name:'08.08.2021, 12:08:56 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4909960,lon:32.5450381,name:'08.08.2021, 12:08:56 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4881702,lon:32.5530984,name:'08.08.2021, 12:08:56 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4867799,lon:32.5568023,name:'08.08.2021, 12:08:56 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4822577,lon:32.5765657,name:'08.08.2021, 12:08:56 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4821428,lon:32.5757781,name:'08.08.2021, 12:08:56 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4810662,lon:32.6027570,name:'08.08.2021, 12:08:56 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4816879,lon:32.6243487,name:'08.08.2021, 12:08:56 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4814567,lon:32.6295037,name:'08.08.2021, 12:08:56 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4826099,lon:32.6430431,name:'08.08.2021, 12:08:56 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4833150,lon:32.6479511,name:'08.08.2021, 12:08:56 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4834278,lon:32.6499308,name:'08.08.2021, 12:08:56 31',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4820764,lon:32.6628284,name:'08.08.2021, 12:08:56 32',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4819419,lon:32.6712113,name:'08.08.2021, 12:08:56 33',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4813383,lon:32.6780547,name:'08.08.2021, 12:08:56 34',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4808109,lon:32.6807145,name:'08.08.2021, 12:08:56 35',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4801333,lon:32.6811721,name:'08.08.2021, 12:08:56 36',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4798061,lon:32.6812704,name:'08.08.2021, 12:08:56 37',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4797302,lon:32.6812224,name:'08.08.2021, 12:08:56 38',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4796978,lon:32.6811571,name:'08.08.2021, 12:08:56 39',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4788160,lon:32.6770859,name:'08.08.2021, 12:08:56 40',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4788813,lon:32.6762054,name:'08.08.2021, 12:08:56 41',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4791254,lon:32.6779548,name:'08.08.2021, 12:08:56 42',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4778374,lon:32.7061589,name:'08.08.2021, 12:08:56 43',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4775204,lon:32.7036565,name:'08.08.2021, 12:08:56 44',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4775742,lon:32.7113377,name:'08.08.2021, 12:08:56 45',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4772096,lon:32.7153282,name:'08.08.2021, 12:08:56 46',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4763623,lon:32.7173852,name:'08.08.2021, 12:08:56 47',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4756030,lon:32.7170097,name:'08.08.2021, 12:08:56 48',desc:'',color:'',icon:'Pizza'});
+                                GV_Draw_Marker({lat:69.4759320,lon:32.7182105,name:'08.08.2021, 21:02:59 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.4773510,lon:32.7250973,name:'08.08.2021, 21:02:59 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4777309,lon:32.7275358,name:'08.08.2021, 21:02:59 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4778510,lon:32.7308026,name:'08.08.2021, 21:02:59 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4775229,lon:32.7375956,name:'08.08.2021, 21:02:59 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4776377,lon:32.7404528,name:'08.08.2021, 21:02:59 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4769914,lon:32.7461512,name:'08.08.2021, 21:02:59 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4770975,lon:32.7470699,name:'08.08.2021, 21:02:59 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4762159,lon:32.7528629,name:'08.08.2021, 21:02:59 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4756562,lon:32.7552186,name:'08.08.2021, 21:02:59 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4749918,lon:32.7570164,name:'08.08.2021, 21:02:59 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4746538,lon:32.7584628,name:'08.08.2021, 21:02:59 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4737925,lon:32.7610816,name:'08.08.2021, 21:02:59 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4735930,lon:32.7619408,name:'08.08.2021, 21:02:59 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4735423,lon:32.7621050,name:'08.08.2021, 21:02:59 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4735194,lon:32.7621571,name:'08.08.2021, 21:02:59 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4734986,lon:32.7622385,name:'08.08.2021, 21:02:59 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4733662,lon:32.7628207,name:'08.08.2021, 21:02:59 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4715515,lon:32.7682157,name:'08.08.2021, 21:02:59 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4712273,lon:32.7685079,name:'08.08.2021, 21:02:59 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4694756,lon:32.7730312,name:'08.08.2021, 21:02:59 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4683083,lon:32.7754720,name:'08.08.2021, 21:02:59 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4677753,lon:32.7769413,name:'08.08.2021, 21:02:59 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4667521,lon:32.7786621,name:'08.08.2021, 21:02:59 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4662864,lon:32.7787977,name:'08.08.2021, 21:02:59 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4654701,lon:32.7795256,name:'08.08.2021, 21:02:59 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4646894,lon:32.7806692,name:'08.08.2021, 21:02:59 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4645852,lon:32.7809911,name:'08.08.2021, 21:02:59 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4642693,lon:32.7812297,name:'08.08.2021, 21:02:59 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4633784,lon:32.7823317,name:'08.08.2021, 21:02:59 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4623102,lon:32.7837933,name:'08.08.2021, 21:02:59 31',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4614063,lon:32.7845731,name:'08.08.2021, 21:02:59 32',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4612938,lon:32.7851266,name:'08.08.2021, 21:02:59 33',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4614140,lon:32.7845145,name:'08.08.2021, 21:02:59 34',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4617343,lon:32.7843150,name:'08.08.2021, 21:02:59 35',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4615293,lon:32.7846514,name:'08.08.2021, 21:02:59 36',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4613138,lon:32.7851916,name:'08.08.2021, 21:02:59 37',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4613052,lon:32.7850406,name:'08.08.2021, 21:02:59 38',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4613291,lon:32.7850038,name:'08.08.2021, 21:02:59 39',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4613640,lon:32.7848331,name:'08.08.2021, 21:02:59 40',desc:'',color:'',icon:'Campground'});
+                                GV_Draw_Marker({lat:69.4622599,lon:32.7838621,name:'09.08.2021, 10:47:11 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.4620980,lon:32.7830019,name:'09.08.2021, 10:47:11 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4647829,lon:32.7815300,name:'09.08.2021, 10:47:11 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4663239,lon:32.7830020,name:'09.08.2021, 10:47:11 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4677699,lon:32.7877133,name:'09.08.2021, 10:47:11 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4684215,lon:32.7921064,name:'09.08.2021, 10:47:11 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4685017,lon:32.8131680,name:'09.08.2021, 10:47:11 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4671491,lon:32.8399415,name:'09.08.2021, 10:47:11 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4672570,lon:32.8455356,name:'09.08.2021, 10:47:11 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4671438,lon:32.8480563,name:'09.08.2021, 10:47:11 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4652816,lon:32.8775365,name:'09.08.2021, 10:47:11 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4646156,lon:32.8831962,name:'09.08.2021, 10:47:11 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4646824,lon:32.8833424,name:'09.08.2021, 10:47:11 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4650007,lon:32.8838095,name:'09.08.2021, 10:47:11 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4651896,lon:32.8853408,name:'09.08.2021, 10:47:11 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4646396,lon:32.8999560,name:'09.08.2021, 10:47:11 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4618723,lon:32.9238709,name:'09.08.2021, 10:47:11 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4618875,lon:32.9285147,name:'09.08.2021, 10:47:11 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4625290,lon:32.9346799,name:'09.08.2021, 10:47:11 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4624623,lon:32.9393258,name:'09.08.2021, 10:47:11 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4581552,lon:32.9823679,name:'09.08.2021, 10:47:11 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4571023,lon:33.0015888,name:'09.08.2021, 10:47:11 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4574942,lon:33.0055975,name:'09.08.2021, 10:47:11 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4567796,lon:33.0224804,name:'09.08.2021, 10:47:11 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4567337,lon:33.0390114,name:'09.08.2021, 10:47:11 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4564146,lon:33.0432119,name:'09.08.2021, 10:47:11 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4566338,lon:33.0430912,name:'09.08.2021, 10:47:11 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4576318,lon:33.0505320,name:'09.08.2021, 10:47:11 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4573971,lon:33.0581837,name:'09.08.2021, 10:47:11 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4568901,lon:33.0610077,name:'09.08.2021, 10:47:11 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4536504,lon:33.0685291,name:'09.08.2021, 10:47:11 31',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4523779,lon:33.0746132,name:'09.08.2021, 10:47:11 32',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4512226,lon:33.0760561,name:'09.08.2021, 10:47:11 33',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4472319,lon:33.0759099,name:'09.08.2021, 10:47:11 34',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4423330,lon:33.0724904,name:'09.08.2021, 10:47:11 35',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4380377,lon:33.0713736,name:'09.08.2021, 10:47:11 36',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4340244,lon:33.0737923,name:'09.08.2021, 10:47:11 37',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4322308,lon:33.0761454,name:'09.08.2021, 10:47:11 38',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4285579,lon:33.0801314,name:'09.08.2021, 10:47:11 39',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4276429,lon:33.0815500,name:'09.08.2021, 10:47:11 40',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4255840,lon:33.0844201,name:'09.08.2021, 10:47:11 41',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4221286,lon:33.0911212,name:'09.08.2021, 10:47:11 42',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4180892,lon:33.1027166,name:'09.08.2021, 10:47:11 43',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4177764,lon:33.1047839,name:'09.08.2021, 10:47:11 44',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4171433,lon:33.1077034,name:'09.08.2021, 10:47:11 45',desc:'',color:'',icon:'Ghost Town'});
+                                GV_Draw_Marker({lat:69.4171622,lon:33.1077877,name:'09.08.2021, 17:10:14 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.4175189,lon:33.1052776,name:'09.08.2021, 17:10:14 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4196320,lon:33.0988889,name:'09.08.2021, 17:10:14 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4209323,lon:33.0997232,name:'09.08.2021, 17:10:14 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4234908,lon:33.1074921,name:'09.08.2021, 17:10:14 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4272238,lon:33.1131650,name:'09.08.2021, 17:10:14 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4295516,lon:33.1162398,name:'09.08.2021, 17:10:14 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4304465,lon:33.1184780,name:'09.08.2021, 17:10:14 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4316091,lon:33.1204786,name:'09.08.2021, 17:10:14 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4324256,lon:33.1227712,name:'09.08.2021, 17:10:14 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4358778,lon:33.1346829,name:'09.08.2021, 17:10:14 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4381751,lon:33.1418983,name:'09.08.2021, 17:10:14 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4392679,lon:33.1484174,name:'09.08.2021, 17:10:14 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4392432,lon:33.1533035,name:'09.08.2021, 17:10:14 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4395258,lon:33.1541330,name:'09.08.2021, 17:10:14 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4338342,lon:33.1755253,name:'09.08.2021, 17:10:14 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4319771,lon:33.1836299,name:'09.08.2021, 17:10:14 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4309519,lon:33.1910023,name:'09.08.2021, 17:10:14 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4299292,lon:33.1960386,name:'09.08.2021, 17:10:14 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4281321,lon:33.2028601,name:'09.08.2021, 17:10:14 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4279669,lon:33.2035803,name:'09.08.2021, 17:10:14 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4234822,lon:33.2164952,name:'09.08.2021, 17:10:14 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4219352,lon:33.2260836,name:'09.08.2021, 17:10:14 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4198011,lon:33.2339693,name:'09.08.2021, 17:10:14 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4175227,lon:33.2396707,name:'09.08.2021, 17:10:14 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4154448,lon:33.2664535,name:'09.08.2021, 17:10:14 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4139349,lon:33.2785602,name:'09.08.2021, 17:10:14 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4131285,lon:33.2810056,name:'09.08.2021, 17:10:14 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4130389,lon:33.2809878,name:'09.08.2021, 17:10:14 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4126900,lon:33.2877736,name:'09.08.2021, 17:10:14 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4120563,lon:33.2914349,name:'09.08.2021, 17:10:14 31',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4126651,lon:33.2867648,name:'09.08.2021, 17:10:14 32',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4124484,lon:33.2827063,name:'09.08.2021, 17:10:14 33',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4118179,lon:33.2821573,name:'09.08.2021, 17:10:14 34',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4117062,lon:33.2817695,name:'09.08.2021, 17:10:14 35',desc:'',color:'',icon:'Campground'});
+                                GV_Draw_Marker({lat:69.4122385,lon:33.2825792,name:'10.08.2021, 10:08:49 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.4145921,lon:33.2792062,name:'10.08.2021, 10:08:49 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4175422,lon:33.2792844,name:'10.08.2021, 10:08:49 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4186284,lon:33.2816516,name:'10.08.2021, 10:08:49 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4190085,lon:33.2819078,name:'10.08.2021, 10:08:49 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4192737,lon:33.2831227,name:'10.08.2021, 10:08:49 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4204964,lon:33.2852740,name:'10.08.2021, 10:08:49 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4224733,lon:33.2905687,name:'10.08.2021, 10:08:49 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4235034,lon:33.2924146,name:'10.08.2021, 10:08:49 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4242652,lon:33.2946538,name:'10.08.2021, 10:08:49 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4267042,lon:33.3007519,name:'10.08.2021, 10:08:49 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4272443,lon:33.3020253,name:'10.08.2021, 10:08:49 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4280379,lon:33.3056520,name:'10.08.2021, 10:08:49 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4285571,lon:33.3087926,name:'10.08.2021, 10:08:49 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4283105,lon:33.3281098,name:'10.08.2021, 10:08:49 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4272138,lon:33.3430340,name:'10.08.2021, 10:08:49 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4269441,lon:33.3454625,name:'10.08.2021, 10:08:49 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4249808,lon:33.3744447,name:'10.08.2021, 10:08:49 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4249203,lon:33.3839302,name:'10.08.2021, 10:08:49 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4253749,lon:33.3935279,name:'10.08.2021, 10:08:49 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4254432,lon:33.4027272,name:'10.08.2021, 10:08:49 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4254485,lon:33.4027887,name:'10.08.2021, 10:08:49 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4249394,lon:33.4386071,name:'10.08.2021, 10:08:49 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4185285,lon:33.4558507,name:'10.08.2021, 10:08:49 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4158602,lon:33.4651929,name:'10.08.2021, 10:08:49 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4139744,lon:33.4687001,name:'10.08.2021, 10:08:49 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4117398,lon:33.4729654,name:'10.08.2021, 10:08:49 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4102292,lon:33.4764958,name:'10.08.2021, 10:08:49 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4098167,lon:33.4777403,name:'10.08.2021, 10:08:49 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4071685,lon:33.4849635,name:'10.08.2021, 10:08:49 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4051021,lon:33.4931212,name:'10.08.2021, 10:08:49 31',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4031138,lon:33.4978838,name:'10.08.2021, 10:08:49 32',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4023764,lon:33.4990719,name:'10.08.2021, 10:08:49 33',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.4000521,lon:33.5009975,name:'10.08.2021, 10:08:49 34',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3984911,lon:33.5011798,name:'10.08.2021, 10:08:49 35',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3947499,lon:33.4993357,name:'10.08.2021, 10:08:49 36',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3920453,lon:33.4989384,name:'10.08.2021, 10:08:49 37',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3875887,lon:33.4946437,name:'10.08.2021, 10:08:49 38',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3869459,lon:33.4942118,name:'10.08.2021, 10:08:49 39',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3852127,lon:33.4920134,name:'10.08.2021, 10:08:49 40',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3844230,lon:33.4891211,name:'10.08.2021, 10:08:49 41',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3843040,lon:33.4871314,name:'10.08.2021, 10:08:49 42',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3837367,lon:33.4843005,name:'10.08.2021, 10:08:49 43',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3828150,lon:33.4747230,name:'10.08.2021, 10:08:49 44',desc:'',color:'',icon:'Pizza'});
+                                GV_Draw_Marker({lat:69.3827220,lon:33.4748926,name:'10.08.2021, 13:50:35 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.3806390,lon:33.4819017,name:'10.08.2021, 13:50:35 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3766422,lon:33.4837706,name:'10.08.2021, 13:50:35 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3684826,lon:33.4853546,name:'10.08.2021, 13:50:35 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3557460,lon:33.4900917,name:'10.08.2021, 13:50:35 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3455464,lon:33.4904911,name:'10.08.2021, 13:50:35 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3452339,lon:33.4909638,name:'10.08.2021, 13:50:35 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3422661,lon:33.5093656,name:'10.08.2021, 13:50:35 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3393592,lon:33.5474108,name:'10.08.2021, 13:50:35 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3347003,lon:33.5886375,name:'10.08.2021, 13:50:35 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3348633,lon:33.5923518,name:'10.08.2021, 13:50:35 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3327203,lon:33.6028867,name:'10.08.2021, 13:50:35 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3299482,lon:33.6122207,name:'10.08.2021, 13:50:35 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3275879,lon:33.6173858,name:'10.08.2021, 13:50:35 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3265500,lon:33.6190949,name:'10.08.2021, 13:50:35 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3259191,lon:33.6195514,name:'10.08.2021, 13:50:35 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3249197,lon:33.6217812,name:'10.08.2021, 13:50:35 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3216276,lon:33.6278612,name:'10.08.2021, 13:50:35 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3219010,lon:33.6280112,name:'10.08.2021, 13:50:35 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3217869,lon:33.6274427,name:'10.08.2021, 13:50:35 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3206492,lon:33.6296245,name:'10.08.2021, 13:50:35 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3190002,lon:33.6336561,name:'10.08.2021, 13:50:35 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3152875,lon:33.6392450,name:'10.08.2021, 13:50:35 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3096859,lon:33.6501897,name:'10.08.2021, 13:50:35 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3080756,lon:33.6550625,name:'10.08.2021, 13:50:35 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3056610,lon:33.6600409,name:'10.08.2021, 13:50:35 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3024382,lon:33.6718538,name:'10.08.2021, 13:50:35 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3016355,lon:33.6734502,name:'10.08.2021, 13:50:35 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2985195,lon:33.6716918,name:'10.08.2021, 13:50:35 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2948662,lon:33.6655755,name:'10.08.2021, 13:50:35 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2905308,lon:33.6564948,name:'10.08.2021, 13:50:35 31',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2898624,lon:33.6543017,name:'10.08.2021, 13:50:35 32',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2896584,lon:33.6523159,name:'10.08.2021, 13:50:35 33',desc:'',color:'',icon:'Campground'});
+                                GV_Draw_Marker({lat:69.2955809,lon:33.6689682,name:'11.08.2021, 11:44:11 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.2964304,lon:33.6704829,name:'11.08.2021, 11:44:11 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2973906,lon:33.6737054,name:'11.08.2021, 11:44:11 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3022886,lon:33.6988804,name:'11.08.2021, 11:44:11 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3024522,lon:33.6993768,name:'11.08.2021, 11:44:11 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3030187,lon:33.7002065,name:'11.08.2021, 11:44:11 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3032288,lon:33.7062076,name:'11.08.2021, 11:44:11 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3058259,lon:33.7224654,name:'11.08.2021, 11:44:11 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3070383,lon:33.7319338,name:'11.08.2021, 11:44:11 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3083975,lon:33.7393562,name:'11.08.2021, 11:44:11 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3081573,lon:33.7485569,name:'11.08.2021, 11:44:11 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3069595,lon:33.7636274,name:'11.08.2021, 11:44:11 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3072112,lon:33.7883660,name:'11.08.2021, 11:44:11 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3079929,lon:33.8117796,name:'11.08.2021, 11:44:11 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3086515,lon:33.8169636,name:'11.08.2021, 11:44:11 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3102292,lon:33.8253438,name:'11.08.2021, 11:44:11 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3101402,lon:33.8279007,name:'11.08.2021, 11:44:11 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3103748,lon:33.8308857,name:'11.08.2021, 11:44:11 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3100467,lon:33.8404917,name:'11.08.2021, 11:44:11 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3100609,lon:33.8629102,name:'11.08.2021, 11:44:11 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3114620,lon:33.9046731,name:'11.08.2021, 11:44:11 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3126200,lon:33.9196178,name:'11.08.2021, 11:44:11 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3154944,lon:33.9430095,name:'11.08.2021, 11:44:11 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3157801,lon:33.9462614,name:'11.08.2021, 11:44:11 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3159200,lon:33.9468959,name:'11.08.2021, 11:44:11 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3159907,lon:33.9471605,name:'11.08.2021, 11:44:11 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3161707,lon:33.9480022,name:'11.08.2021, 11:44:11 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3163568,lon:33.9489498,name:'11.08.2021, 11:44:11 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3165805,lon:33.9506745,name:'11.08.2021, 11:44:11 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3158867,lon:33.9544007,name:'11.08.2021, 11:44:11 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3130673,lon:33.9765013,name:'11.08.2021, 11:44:11 31',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3105405,lon:34.0113868,name:'11.08.2021, 11:44:11 32',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3098759,lon:34.0176752,name:'11.08.2021, 11:44:11 33',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3090963,lon:34.0297256,name:'11.08.2021, 11:44:11 34',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3086601,lon:34.0576091,name:'11.08.2021, 11:44:11 35',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3086379,lon:34.0581846,name:'11.08.2021, 11:44:11 36',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3061363,lon:34.0642516,name:'11.08.2021, 11:44:11 37',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3050270,lon:34.0656390,name:'11.08.2021, 11:44:11 38',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3037535,lon:34.0667546,name:'11.08.2021, 11:44:11 39',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3035494,lon:34.0672094,name:'11.08.2021, 11:44:11 40',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3031173,lon:34.0671078,name:'11.08.2021, 11:44:11 41',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3033568,lon:34.0672454,name:'11.08.2021, 11:44:11 42',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3033150,lon:34.0680904,name:'11.08.2021, 11:44:11 43',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3024773,lon:34.0704905,name:'11.08.2021, 11:44:11 44',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3021024,lon:34.0704204,name:'11.08.2021, 11:44:11 45',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3017980,lon:34.0691103,name:'11.08.2021, 11:44:11 46',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3012152,lon:34.0687134,name:'11.08.2021, 11:44:11 47',desc:'',color:'',icon:'Campground'});
+                                GV_Draw_Marker({lat:69.3021039,lon:34.0705880,name:'12.08.2021, 11:33:21 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.3022471,lon:34.0718223,name:'12.08.2021, 11:33:21 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3028568,lon:34.0722513,name:'12.08.2021, 11:33:21 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3034432,lon:34.0743966,name:'12.08.2021, 11:33:21 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3047693,lon:34.0825771,name:'12.08.2021, 11:33:21 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3068814,lon:34.1109355,name:'12.08.2021, 11:33:21 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3069431,lon:34.1183472,name:'12.08.2021, 11:33:21 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3075456,lon:34.1218057,name:'12.08.2021, 11:33:21 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3062672,lon:34.1382018,name:'12.08.2021, 11:33:21 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3052802,lon:34.1506648,name:'12.08.2021, 11:33:21 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3058511,lon:34.1591370,name:'12.08.2021, 11:33:21 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3039074,lon:34.1655918,name:'12.08.2021, 11:33:21 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3035209,lon:34.1693078,name:'12.08.2021, 11:33:21 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3042882,lon:34.1793812,name:'12.08.2021, 11:33:21 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3042384,lon:34.1911110,name:'12.08.2021, 11:33:21 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3031927,lon:34.2010467,name:'12.08.2021, 11:33:21 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3031448,lon:34.2203424,name:'12.08.2021, 11:33:21 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3026807,lon:34.2420286,name:'12.08.2021, 11:33:21 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3027606,lon:34.2494839,name:'12.08.2021, 11:33:21 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3019303,lon:34.2601073,name:'12.08.2021, 11:33:21 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3021554,lon:34.2664853,name:'12.08.2021, 11:33:21 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3016775,lon:34.2830949,name:'12.08.2021, 11:33:21 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3017923,lon:34.2929015,name:'12.08.2021, 11:33:21 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3031744,lon:34.3114453,name:'12.08.2021, 11:33:21 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3022344,lon:34.3181060,name:'12.08.2021, 11:33:21 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.3004997,lon:34.3230897,name:'12.08.2021, 11:33:21 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2979714,lon:34.3347860,name:'12.08.2021, 11:33:21 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2912840,lon:34.3771347,name:'12.08.2021, 11:33:21 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2900791,lon:34.3805980,name:'12.08.2021, 11:33:21 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2896657,lon:34.3818816,name:'12.08.2021, 11:33:21 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2897896,lon:34.3859857,name:'12.08.2021, 11:33:21 31',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2901160,lon:34.3859249,name:'12.08.2021, 11:33:21 32',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2898366,lon:34.3861168,name:'12.08.2021, 11:33:21 33',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2897548,lon:34.3846635,name:'12.08.2021, 11:33:21 34',desc:'',color:'',icon:'Pizza'});
+                                GV_Draw_Marker({lat:69.2912631,lon:34.3837258,name:'12.08.2021, 16:11:36 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.2928019,lon:34.3972999,name:'12.08.2021, 16:11:36 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2931380,lon:34.4025105,name:'12.08.2021, 16:11:36 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2926443,lon:34.4072034,name:'12.08.2021, 16:11:36 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2916492,lon:34.4110025,name:'12.08.2021, 16:11:36 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2900783,lon:34.4149374,name:'12.08.2021, 16:11:36 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2881609,lon:34.4181867,name:'12.08.2021, 16:11:36 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2852754,lon:34.4245607,name:'12.08.2021, 16:11:36 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2844111,lon:34.4259520,name:'12.08.2021, 16:11:36 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2819503,lon:34.4315046,name:'12.08.2021, 16:11:36 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2789115,lon:34.4371292,name:'12.08.2021, 16:11:36 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2732607,lon:34.4517074,name:'12.08.2021, 16:11:36 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2704081,lon:34.4598637,name:'12.08.2021, 16:11:36 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2687844,lon:34.4657663,name:'12.08.2021, 16:11:36 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2682286,lon:34.4668297,name:'12.08.2021, 16:11:36 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2681682,lon:34.4670739,name:'12.08.2021, 16:11:36 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2668526,lon:34.4690897,name:'12.08.2021, 16:11:36 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2668449,lon:34.4690762,name:'12.08.2021, 16:11:36 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2656513,lon:34.4715562,name:'12.08.2021, 16:11:36 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2623304,lon:34.4769798,name:'12.08.2021, 16:11:36 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2613482,lon:34.4792390,name:'12.08.2021, 16:11:36 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2590003,lon:34.4831740,name:'12.08.2021, 16:11:36 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2579381,lon:34.4832717,name:'12.08.2021, 16:11:36 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2568704,lon:34.4815212,name:'12.08.2021, 16:11:36 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2563896,lon:34.4811106,name:'12.08.2021, 16:11:36 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2553148,lon:34.4792165,name:'12.08.2021, 16:11:36 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2552833,lon:34.4783366,name:'12.08.2021, 16:11:36 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2545973,lon:34.4753503,name:'12.08.2021, 16:11:36 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2548505,lon:34.4745455,name:'12.08.2021, 16:11:36 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2547031,lon:34.4748549,name:'12.08.2021, 16:11:36 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2548880,lon:34.4748229,name:'12.08.2021, 16:11:36 31',desc:'',color:'',icon:'Campground'});
+                                GV_Draw_Marker({lat:69.2544943,lon:34.4750104,name:'14.08.2021, 10:55:16 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.2554455,lon:34.4854171,name:'14.08.2021, 10:55:16 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2582951,lon:34.5004524,name:'14.08.2021, 10:55:16 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2595547,lon:34.5092020,name:'14.08.2021, 10:55:16 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2602295,lon:34.5137573,name:'14.08.2021, 10:55:16 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2619452,lon:34.5211370,name:'14.08.2021, 10:55:16 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2625215,lon:34.5248596,name:'14.08.2021, 10:55:16 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2625459,lon:34.5337655,name:'14.08.2021, 10:55:16 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2623584,lon:34.5394582,name:'14.08.2021, 10:55:16 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2625589,lon:34.5428710,name:'14.08.2021, 10:55:16 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2614191,lon:34.5683357,name:'14.08.2021, 10:55:16 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2597237,lon:34.5804535,name:'14.08.2021, 10:55:16 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2589948,lon:34.5878197,name:'14.08.2021, 10:55:16 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2557003,lon:34.6165910,name:'14.08.2021, 10:55:16 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2554733,lon:34.6202751,name:'14.08.2021, 10:55:16 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2517831,lon:34.6435162,name:'14.08.2021, 10:55:16 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2508743,lon:34.6461902,name:'14.08.2021, 10:55:16 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2487505,lon:34.6605423,name:'14.08.2021, 10:55:16 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2474335,lon:34.6724665,name:'14.08.2021, 10:55:16 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2456357,lon:34.7015587,name:'14.08.2021, 10:55:16 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2445221,lon:34.7091535,name:'14.08.2021, 10:55:16 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2428150,lon:34.7268003,name:'14.08.2021, 10:55:16 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2408117,lon:34.7397483,name:'14.08.2021, 10:55:16 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2391853,lon:34.7508929,name:'14.08.2021, 10:55:16 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2390160,lon:34.7522626,name:'14.08.2021, 10:55:16 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2379242,lon:34.7642794,name:'14.08.2021, 10:55:16 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2370064,lon:34.7708166,name:'14.08.2021, 10:55:16 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2363611,lon:34.7728657,name:'14.08.2021, 10:55:16 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2360075,lon:34.7748311,name:'14.08.2021, 10:55:16 29',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2346679,lon:34.7849744,name:'14.08.2021, 10:55:16 30',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2332370,lon:34.8032316,name:'14.08.2021, 10:55:16 31',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2252977,lon:34.8533566,name:'14.08.2021, 10:55:16 32',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2237609,lon:34.8599538,name:'14.08.2021, 10:55:16 33',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2222813,lon:34.8630745,name:'14.08.2021, 10:55:16 34',desc:'',color:'',icon:'Pizza'});
+                                GV_Draw_Marker({lat:69.2238872,lon:34.8625145,name:'14.08.2021, 15:35:01 1',desc:'',color:'',icon:'Flag'});
+                                GV_Draw_Marker({lat:69.2257418,lon:34.8706833,name:'14.08.2021, 15:35:01 2',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2260151,lon:34.8783265,name:'14.08.2021, 15:35:01 3',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2257300,lon:34.8830484,name:'14.08.2021, 15:35:01 4',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2242412,lon:34.8902634,name:'14.08.2021, 15:35:01 5',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2234366,lon:34.9067108,name:'14.08.2021, 15:35:01 6',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2233003,lon:34.9162621,name:'14.08.2021, 15:35:01 7',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2227555,lon:34.9211314,name:'14.08.2021, 15:35:01 8',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2223488,lon:34.9295518,name:'14.08.2021, 15:35:01 9',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2216577,lon:34.9417846,name:'14.08.2021, 15:35:01 10',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2187807,lon:34.9711109,name:'14.08.2021, 15:35:01 11',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2185233,lon:34.9763677,name:'14.08.2021, 15:35:01 12',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2185383,lon:34.9767803,name:'14.08.2021, 15:35:01 13',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2171503,lon:35.0098000,name:'14.08.2021, 15:35:01 14',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2159539,lon:35.0272928,name:'14.08.2021, 15:35:01 15',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2152458,lon:35.0483004,name:'14.08.2021, 15:35:01 16',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2142833,lon:35.0549400,name:'14.08.2021, 15:35:01 17',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2126459,lon:35.0609923,name:'14.08.2021, 15:35:01 18',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2119609,lon:35.0622149,name:'14.08.2021, 15:35:01 19',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2097225,lon:35.0646959,name:'14.08.2021, 15:35:01 20',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2054477,lon:35.0677779,name:'14.08.2021, 15:35:01 21',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2053853,lon:35.0722815,name:'14.08.2021, 15:35:01 22',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2040608,lon:35.0785078,name:'14.08.2021, 15:35:01 23',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2047235,lon:35.0816457,name:'14.08.2021, 15:35:01 24',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2044732,lon:35.0825942,name:'14.08.2021, 15:35:01 25',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2040203,lon:35.0829610,name:'14.08.2021, 15:35:01 26',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2032098,lon:35.0844021,name:'14.08.2021, 15:35:01 27',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2036334,lon:35.0831387,name:'14.08.2021, 15:35:01 28',desc:'',color:'',icon:'Waypoint'});
+                                GV_Draw_Marker({lat:69.2032894,lon:35.0840783,name:'14.08.2021, 15:35:01 29',desc:'',color:'',icon:'Campground'});
+
+                                GV_Finish_Map();
+
+                        }
+                        GV_Map(); // execute the above code
+                        // https://www.gpsvisualizer.com/map_input?form=leaflet
+                </script>
+
+
+
+        </body>
+
+</html>
